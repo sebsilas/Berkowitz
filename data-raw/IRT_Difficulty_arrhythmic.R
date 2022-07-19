@@ -10,9 +10,20 @@ library(magrittr)
 Berkowitz_IRT_arrhythmic <- Berkowitz("main") %>%
   dplyr::filter(N > 2)
 
+Berkowitz_IRT_arrhythmic_phrases <- Berkowitz("phrases") %>%
+  dplyr::filter(N > 2)
+
 
 Berkowitz_IRT_arrhythmic <- Berkowitz_IRT_arrhythmic %>%
   select(melody, N, step.cont.loc.var, tonalness, log_freq)
+
+Berkowitz_IRT_arrhythmic_phrases <- Berkowitz_IRT_arrhythmic_phrases %>%
+  select(melody, N, step.cont.loc.var, tonalness, log_freq)
+
+
+Berkowitz_IRT_arrhythmic <- Berkowitz_IRT_arrhythmic %>%
+  rbind(Berkowitz_IRT_arrhythmic_phrases)
+
 
 # normal
 

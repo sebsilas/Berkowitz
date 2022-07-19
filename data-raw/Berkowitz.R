@@ -1,4 +1,6 @@
 
+library(tidyverse)
+
 #load(file = 'data/Berkowitz_files_db.rda')
 #load(file = 'data/Berkowitz_freq_db.rda')
 #load(file = 'data/Berkowitz_ngram_db.rda')
@@ -32,5 +34,27 @@ Berkowitz <- corpus_to_item_bank(corpus_name = "Berkowitz",
 #Berkowitz("files")
 
 
+remove_tags <- function(string, tag) {
+  stringr::str_remove(string, paste0("<",tag,">")) %>%
+    stringr::str_remove(., paste0("</",tag,">")) %>%
+    gsub(" ", "", .)
+}
 
-usethis::use_data(Berkowitz, overwrite = TRUE)
+
+grab_first_note_of_music_xml <- function(f) {
+  f <- system.file(f, package = "Berkowitz")
+  t <- readLines(f)
+  step <- remove_tags(t[which.min(!grepl("step", t))], "step")
+  octave <- remove_tags(t[which.min(!grepl("octave", t))], "octave")
+  sci_no <- paste0(step, octave)
+}
+
+Berkowitz_files_with_first_note <- Berkowitz("files") %>%
+  mutate(first_note = stringr::str_replace(musicxml_file,
+                                           "item_banks",
+                                           "extdata"),
+  first_note = purrr::map(first_note, grab_first_note_of_music_xml),
+  first_note_midi = itembankr::sci_notation_to_midi(first_note))
+
+
+usethis::use_data(Berkowitz_files_with_first_note, overwrite = TRUE)
