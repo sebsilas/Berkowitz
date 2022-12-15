@@ -25,7 +25,6 @@ Berkowitz_IRT_arrhythmic <- Berkowitz_IRT_arrhythmic %>%
   rbind(Berkowitz_IRT_arrhythmic_phrases)
 
 
-# normal
 
 difficulty <- predict(Berkowitz::lm2.2,
                       newdata = Berkowitz_IRT_arrhythmic,
@@ -61,7 +60,13 @@ Berkowitz_IRT_arrhythmic_scaled <- Berkowitz_IRT_arrhythmic_scaled %>% unique()
 
 Berkowitz_IRT_arrhythmic_scaled %>% select(-melody) %>% itembankr::hist_item_bank()
 
+
+Berkowitz_IRT_arrhythmic_scale_factors <- Berkowitz_IRT_arrhythmic %>%
+  summarise(across(N:log_freq, range, na.rm = TRUE))
+
 use_data(Berkowitz_IRT_arrhythmic_scaled, overwrite = TRUE)
+use_data(Berkowitz_IRT_arrhythmic_scale_factors, overwrite = TRUE)
+
 
 
 # length only
