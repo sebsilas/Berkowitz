@@ -44,11 +44,70 @@ create_item_bank(name = "Berkowitz",
 
 
 
-load('Berkowitz_ngram.rda')
-load('Berkowitz_combined.rda')
-load('Berkowitz_phrase.rda')
-load('Berkowitz_item.rda')
-load('Berkowitz_file.rda')
+load('data-raw/Berkowitz_ngram.rda')
+load('data-raw/Berkowitz_combined.rda')
+load('data-raw/Berkowitz_phrase.rda')
+load('data-raw/Berkowitz_item.rda')
+load('data-raw/Berkowitz_file.rda')
+
+
+# Add difficulties
+
+# Only the ngram_item_bank has log_freq column
+
+
+ngram_item_bank <- ngram_item_bank %>%
+  tibble::as_tibble()
+
+
+
+arrhythmic_difficulty <- predict(Berkowitz::lm2.2,
+                      newdata = ngram_item_bank,
+                      re.form = NA) %>% # this instructs the model to predict without random effects )
+                      as.numeric %>%
+                      magrittr::multiply_by(-1) %>%
+                      scales::rescale()
+
+rhythmic_difficulty <- predict(Berkowitz::lm3.2,
+                                 newdata = ngram_item_bank,
+                                 re.form = NA) %>% # this instructs the model to predict without random effects )
+  as.numeric %>%
+  magrittr::multiply_by(-1) %>%
+  scales::rescale()
+
+
+arrhythmic_difficulty_percentile <- ecdf(arrhythmic_difficulty)
+rhythmic_difficulty_percentile <- ecdf(rhythmic_difficulty)
+
+
+get_arrhythmic_difficulty_percentile <- function(v) {
+  round(arrhythmic_difficulty_percentile(v) * 100, 2)
+}
+
+get_rhythmic_difficulty_percentile <- function(v) {
+  round(rhythmic_difficulty_percentile(v) * 100, 2)
+}
+
+
+
+
+ngram_item_bank <- ngram_item_bank %>%
+  mutate(arrhythmic_difficulty = round(arrhythmic_difficulty, 2),
+         rhythmic_difficulty = round(rhythmic_difficulty, 2)) %>%
+  rowwise() %>%
+  mutate(arrhythmic_difficulty_percentile = get_arrhythmic_difficulty_percentile(arrhythmic_difficulty),
+         rhythmic_difficulty_percentile = get_arrhythmic_difficulty_percentile(rhythmic_difficulty)) %>%
+  ungroup() %>%
+  itembankr::set_item_bank_class(extra = "ngram_item_bank")
+
+
+# Manually add name
+
+attr(ngram_item_bank, "item_bank_name") <- "Berkowitz"
+attr(ngram_item_bank, "item_bank_type") <- "ngram"
+
+attr(phrase_item_bank, "item_bank_name") <- "Berkowitz"
+attr(phrase_item_bank, "item_bank_type") <- "phrase"
 
 use_data(combined_item_bank,
      ngram_item_bank,
@@ -60,35 +119,6 @@ use_data(combined_item_bank,
 
 
 
-
-#
-# # Add first note
-#
-# remove_tags <- function(string, tag) {
-#   stringr::str_remove(string, paste0("<",tag,">")) %>%
-#     stringr::str_remove(., paste0("</",tag,">")) %>%
-#     gsub(" ", "", .)
-# }
-#
-#
-# grab_first_note_of_music_xml <- function(f) {
-#   f <- system.file(f, package = "Berkowitz")
-#   t <- readLines(f)
-#   step <- remove_tags(t[which.min(!grepl("step", t))], "step")
-#   octave <- remove_tags(t[which.min(!grepl("octave", t))], "octave")
-#   sci_no <- paste0(step, octave)
-# }
-#
-#
-# Berkowitz_files_with_first_note <- Berkowitz("files") %>%
-#   mutate(first_note = stringr::str_replace(musicxml_file,
-#                                            "item_banks",
-#                                            "extdata"),
-#          first_note = purrr::map(first_note, grab_first_note_of_music_xml),
-#          first_note_midi = itembankr::sci_notation_to_midi(first_note))
-#
-#
-# usethis::use_data(Berkowitz_files_with_first_note, overwrite = TRUE)
 
 
 
