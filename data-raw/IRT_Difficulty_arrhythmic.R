@@ -7,10 +7,12 @@ library(magrittr)
 
 ##
 
-Berkowitz_IRT_arrhythmic <- Berkowitz("main") %>%
+Berkowitz_IRT_arrhythmic <- ngram_item_bank %>%
+  tibble::as_tibble() %>%
   dplyr::filter(N > 2)
 
-Berkowitz_IRT_arrhythmic_phrases <- Berkowitz("phrases") %>%
+Berkowitz_IRT_arrhythmic_phrases <- phrase_item_bank %>%
+  tibble::as_tibble() %>%
   dplyr::filter(N > 2)
 
 
@@ -18,7 +20,8 @@ Berkowitz_IRT_arrhythmic <- Berkowitz_IRT_arrhythmic %>%
   select(melody, N, step.cont.loc.var, tonalness, log_freq)
 
 Berkowitz_IRT_arrhythmic_phrases <- Berkowitz_IRT_arrhythmic_phrases %>%
-  select(melody, N, step.cont.loc.var, tonalness, log_freq)
+  select(melody, N, step.cont.loc.var, tonalness) %>%
+  mutate(log_freq = NA)
 
 
 Berkowitz_IRT_arrhythmic <- Berkowitz_IRT_arrhythmic %>%
@@ -44,7 +47,7 @@ use_data(Berkowitz_IRT_arrhythmic, overwrite = TRUE)
 
 Berkowitz_IRT_arrhythmic_scaled <- Berkowitz_IRT_arrhythmic %>%
   select(melody, N, step.cont.loc.var, tonalness, log_freq) %>%
-  mutate(across(N:log_freq, scale))
+  mutate(across(N:log_freq, ~ as.numeric(scale(.x))))
 
 difficulty <- predict(Berkowitz::lm2.2_scaled,
                       newdata = Berkowitz_IRT_arrhythmic_scaled,
