@@ -43,10 +43,20 @@ create_item_bank(name = "Berkowitz",
 
 
 
+create_item_bank(name = "Berkowitz",
+                 midi_file_dir = "/Users/sebsilas/Berkowitz/data-raw/berkowitz_midi_rhythmic_100bpm",
+                 musicxml_file_dir = "/Users/sebsilas/Berkowitz/data-raw/berkowitz_musicxml",
+                 input = "files",
+                 output = "phrase")
+
+
+
 
 load('data-raw/Berkowitz_ngram.rda')
 load('data-raw/Berkowitz_combined.rda')
 load('data-raw/Berkowitz_phrase.rda')
+phrase_item_bank <- item_bank
+rm(item_bank)
 load('data-raw/Berkowitz_item.rda')
 load('data-raw/Berkowitz_file.rda')
 
