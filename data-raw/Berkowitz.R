@@ -120,11 +120,11 @@ attr(phrase_item_bank, "item_bank_name") <- "Berkowitz"
 attr(phrase_item_bank, "item_bank_type") <- "phrase"
 
 use_data(combined_item_bank,
-     ngram_item_bank,
-     phrase_item_bank,
-     item_item_bank,
-     file_item_bank,
-     compress = "xz", overwrite = TRUE)
+         ngram_item_bank,
+         phrase_item_bank,
+         item_item_bank,
+         file_item_bank,
+         compress = "xz", overwrite = TRUE)
 
 
 

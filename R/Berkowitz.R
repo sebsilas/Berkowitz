@@ -47,3 +47,5 @@
 #' @source \url{DOI:10.2307/3389405}
 "file_item_bank"
 
+#' A subset of Berkowitz optimised to help audio transcription
+"Berkowitz_subset"

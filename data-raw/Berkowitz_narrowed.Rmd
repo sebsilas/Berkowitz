@@ -1,0 +1,37 @@
+
+
+```{r}
+
+library(tidyverse)
+
+load_all()
+
+```
+
+Create a narrowed version of Berkowitz with fewer problems for audio transcription
+
+
+```{r}
+
+Berkowitz_subset <- ngram_item_bank %>%
+  tibble::as_tibble() %>%
+  dplyr::rowwise() %>%
+  dplyr::mutate(max_no_repeated_notes = max(rle(itembankr::str_mel_to_vector(abs_melody))$lengths) ) %>%
+  dplyr::ungroup() %>%
+  filter(max_no_repeated_notes <= 3,
+         mean_duration > 0.4) %>%
+  rowwise() %>%
+  mutate(total_duration = sum(itembankr::str_mel_to_vector(durations), na.rm = TRUE),
+         min_duration = min(itembankr::str_mel_to_vector(durations), na.rm = TRUE),
+         max_duration = max(itembankr::str_mel_to_vector(durations), na.rm = TRUE),
+         rhythmic = abs(sum(diff(itembankr::str_mel_to_vector(durations), na.rm = TRUE))) > 0
+         ) %>%
+  ungroup() %>%
+  filter(between(total_duration, 2, 6),
+         min_duration > 0.15,
+         max_duration < 1.5) %>% 
+  itembankr::set_item_bank_class()
+
+use_data(Berkowitz_subset, overwrite = TRUE)
+
+```
