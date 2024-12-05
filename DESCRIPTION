@@ -1,7 +1,7 @@
 Package: Berkowitz
 Type: Package
 Title: Berkowitz itembankr item bank
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
     person(given = "Sebastian",
            family = "Silas",
